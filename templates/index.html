@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CV Parser</title>
+    <style>
+        #loading {
+            display: none;
+            text-align: center;
+        }
+        #downloadLink {
+            display: none;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload CVs</h1>
+    <form id="uploadForm" action="/parse_cvs" method="post" enctype="multipart/form-data">
+        <input type="file" name="cv_files" multiple>
+        <input type="submit" value="Upload and Parse">
+    </form>    
+    <div id="loading">
+        Please wait while the CVs are being processed...
+        
+    </div>
+    <div id="downloadLink">
+        <a href="/download_output">Download Processed CVs</a>
+    </div>
+
+    <script>
+       
+        function showLoading() {
+            document.getElementById("loading").style.display = "block";
+        }
+
+        
+        function hideLoading() {
+            document.getElementById("loading").style.display = "none";
+        }
+
+    
+        function showDownloadLink() {
+            document.getElementById("downloadLink").style.display = "block";
+        }
+
+        
+        document.getElementById("uploadForm").addEventListener("submit", function(event) {
+            
+            event.preventDefault();
+            
+            showLoading();
+            
+            fetch('/parse_cvs', {
+                method: 'POST',
+                body: new FormData(document.getElementById('uploadForm'))
+            })
+            .then(response => {
+                if (response.ok) {
+                    
+                    showDownloadLink();
+                    hideLoading();
+                    document.getElementById("downloadLink").style.display = "inline";  
+                    return response.text();
+                } else {
+                    throw new Error('CV processing failed');
+                }
+            })
+            .catch(error => {
+                console.error('CV processing error:', error);
+                hideLoading();  
+            });
+        });
+
+    </script>
+</body>
+</html>
